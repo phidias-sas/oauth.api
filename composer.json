@@ -1,0 +1,20 @@
+{
+    "name": "phidias/oauth.api",
+    "description": "OAuth authentication endpoints",
+    "authors": [
+        {
+            "name": "Santiago Cortés",
+            "email": "santiago.cortes@phidias.com"
+        }
+    ],
+
+    "autoload": {
+        "psr-4": {
+            "Phidias\\": "src/Phidias/"
+        }
+    },
+
+    "require": {
+        "firebase/php-jwt": "~1.0"
+    }
+}
