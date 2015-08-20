@@ -1,31 +1,40 @@
 ## Phidias OAuth endpoints
 
-### Installation:
-`composer require phidias/oauth.api`
-
-### Configuration:
+### Setup
+Import OAuth endpoints in your server
 
 ```
-use Phidias\Oauth\Authentication;
+Server::import("vendor/phidias/oauth.api");
+```
 
-Authentication::addCredentialsValidator(function ($username, $password) {
 
+### Configuration
+
+Define a credential validation function that takes
+username and password and return payload data.
+
+Return false or throw exceptions when authentication fails
+
+```
+Phidias\Oauth\Controller::addCredentialsValidator(function ($username, $password) {
     // do your voodoo
-
-    return $boolCredentialsAreValid;
-
+    return $payload;
 });
 
 ```
 
-### Usage:
 
+### Access the token payload globally from you application
 
 ```
-use Phidias\Api\Server;
+use Phidias\Oauth\Token;
 
-// Add OAuth endpoints to your API
-Server::import("vendor/phidias/oauth.api");
+$payload = Token::getPayload();
 
+if ($payload === null) {
+    die("you are not authenticated");
+}
+
+echo "Welcome back, {$payload->firstName}!";
 
 ```

@@ -2,14 +2,13 @@
 
     "oauth/authorization" => [
         "post" => [
-            "controller" => "Phidias\Oauth\Controller->authorization({request.data})"
+            "controller" => "Phidias\Oauth\Controller->authorization({request})"
         ]
     ],
 
     "oauth/token" => [
         "post" => [
-            "validation" => "Phidias\Oauth\Controller::validate({request})",
-            "controller" => "Phidias\Oauth\Controller->token({request.data})"
+            "controller" => "Phidias\Oauth\Controller->token({request})"
         ]
     ]
 

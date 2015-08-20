@@ -3,45 +3,96 @@ namespace Phidias\Oauth;
 
 class Controller
 {
-    public static function validate($request)
+    /**
+     * Authentication function
+     * 
+     * To be used as a dispatcher authentication, like this:
+     * 
+     * // Authenticate token in every request
+     * Server::resource("*", [
+     *     "any" => [
+     *         "authentication" => "Phidias\Oauth\Controller::authenticate({request})"
+     *     ]
+     * ]);
+     * 
+     */
+    public static function authenticate($request)
     {
-        $data = (array)$request->getParsedBody();
+        if ($request->hasHeader("authorization")) {
 
-        if (!isset($data["grant_type"])) {
-            return ["grant_type" => "no grant_type specified"];
+            list($authorizationMethod, $authorizationCredentials) = explode(" ", $request->getHeader("authorization")[0]);
+
+            switch (strtolower($authorizationMethod)) {
+                case "bearer":
+                    Token::load( trim($authorizationCredentials) );
+                break;
+            }
+
         }
 
-        if ( !in_array($data["grant_type"], ["client_credentials", "authorization_code"]) ) {
-            return ["grant_type" => "unknown grant type"];
-        }
+        return true;
     }
 
-    public function token($incoming)
+
+    /**
+     * POST requests to /oauth/token require the user to provide
+     * username and password.  Custom validation functions may be defined
+     * to validate this credentials, like this:
+     * 
+     * Phidias\Oauth\Controller::addCredentialsValidator(function($username, $password) {
+     *      //voo doo
+     *      return $payload;
+     * })
+     * 
+     * It must return the data to be used as the token payload, or throw and exception on failure
+     */
+
+    private static $credentialValidators;
+
+    public static function addCredentialsValidator(Callable $callback)
     {
-        switch ($incoming["grant_type"]) {
+        if (self::$credentialValidators === null) {
+            self::$credentialValidators = [];
+        }
+
+        self::$credentialValidators[] = $callback;
+    }
+
+
+    /**
+     * Dispatch POST /oauth/token
+     */
+    public function token($request)
+    {
+        $postdata = (array)$request->getParsedBody();
+
+        if (!isset($postdata["grant_type"])) {
+            throw new Exception\InvalidRequest("no grant_type specified");
+        }
+
+        switch ($postdata["grant_type"]) {
 
             case "client_credentials":
-
-                return Authentication::getToken();
-
+                $token = self::getTokenFromClientCredentials($request);
             break;
 
+            // 2DO: implement (!!!)
+            //case "authorization_code":
+            //    $token = self::getTokenFromAuthorizationCode($request);
+            //break;
 
-            case "authorization_code":
-
-                $clientId     = "huh";  //$incoming["client_id"]  or basic auth username
-                $clientSecret = "huh";  //$incoming["client_secret"] or basic auth password
-                $code         = $incoming["code"];
-
-                // 2DO: implement (!!!)
-
+            default:
+                throw new Exception\InvalidRequest("unknown grant type");
             break;
-
 
         }
 
+        return $token;
     }
 
+    /**
+     * Dispatch POST /oauth/authorization
+     */
     public function authorization($incoming)
     {
         //See http://tools.ietf.org/html/rfc6749#section-4.1.1
@@ -52,20 +103,50 @@ class Controller
         $state        = $incoming["state"];         //OPTIONAL
 
 
-        switch ($responseType) {
+        // 2DO: implement (!!!)
+    }
 
-            case "code":
-                //$code  = Authentication::generateAuthorizationCode($clientId);
-                //$state = "huh";
-                //redirect to $redirectUri?code=$code&state=$state
 
-            break;
-
-            case "token":
-            break;
-
+    private static function getTokenFromClientCredentials($request)
+    {
+        if (!$request->hasHeader("authorization")) {
+            throw new Exception\InvalidRequest("no authorization header set");
         }
 
+        list($authorizationMethod, $authorizationCredentials) = explode(" ", $request->getHeader("authorization")[0]);
+
+        if (strtolower($authorizationMethod) != "basic") {
+            throw new Exception\InvalidRequest("authorization header must contain basic header credentials");
+        }
+
+        $parts = explode(":", base64_decode(trim($authorizationCredentials)));
+
+        if (count($parts) != 2) {
+            throw new Exception\InvalidRequest("malformed credentials header");
+        }
+
+        list($username, $password) = $parts;
+
+        $payload = self::validateClientCredentials($username, $password);
+
+        return new Token("bearer", $payload);
+    }
+
+
+    private static function validateClientCredentials($username, $password)
+    {
+        if (is_array(self::$credentialValidators)) {
+            foreach (self::$credentialValidators as $validator) {
+
+                $payload = call_user_func($validator, $username, $password);
+
+                if ($payload !== false) {
+                    return $payload;
+                }
+            }
+        }
+
+        throw new Exception\InvalidCredentials;
     }
 
 }

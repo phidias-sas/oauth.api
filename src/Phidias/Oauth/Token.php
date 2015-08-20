@@ -1,6 +1,8 @@
 <?php
 namespace Phidias\Oauth;
 
+use JWT;
+
 class Token
 {
     public $token_type;
@@ -8,4 +10,36 @@ class Token
     public $expires_in;
     public $scope;
     public $refresh_token;
+
+    private static $payload;
+    private static $secret;
+
+    public static function setSecret($secret)
+    {
+        self::$secret = $secret;
+    }
+
+    public static function getPayload()
+    {
+        return self::$payload;
+    }
+
+    public static function load($token)
+    {
+        try {
+            self::$payload = JWT::decode($token, self::$secret);
+        } catch (\Exception $e) {
+            throw new Exception\InvalidToken;
+        }
+    }
+
+    public function __construct($type, $payload)
+    {
+        $this->token_type      = $type;
+        $this->access_token    = JWT::encode($payload, self::$secret);
+        //$this->expires_in    = "???";
+        //$this->scope         = "???";
+        //$this->refresh_token = "???";
+    }
+
 }
