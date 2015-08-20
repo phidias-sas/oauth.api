@@ -1,6 +1,9 @@
 {
     "name": "phidias/oauth.api",
     "description": "OAuth authentication endpoints",
+
+    "license": "GPL-3.0",
+
     "authors": [
         {
             "name": "Santiago Cortés",
