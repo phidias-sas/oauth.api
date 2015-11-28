@@ -2,13 +2,25 @@
 
     "oauth/authorization" => [
         "post" => [
-            "controller" => "Phidias\Oauth\Controller->authorization({request})"
+            "controller" => "Phidias\Oauth\Controller->authorization({request})",
+
+            "catch" => [
+                "Exception" => function($request, $response) {
+                    $response->status(422);
+                }
+            ]
         ]
     ],
 
     "oauth/token" => [
         "post" => [
-            "controller" => "Phidias\Oauth\Controller->token({request})"
+            "controller" => "Phidias\Oauth\Controller->token({request})",
+
+            "catch" => [
+                "Exception" => function($request, $response) {
+                    $response->status(422);
+                }
+            ]
         ]
     ]
 
