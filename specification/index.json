@@ -1,0 +1,38 @@
+{
+    "title": "OAuth",
+    "description": "OAuth2 authentication endpoints",
+
+    "resources": [
+
+        {
+            "url": "/oauth/token",
+            "title": "token endpoint",
+
+            "exchanges": [
+                {
+                    "title": "authenticate with username and password",
+
+                    "request": {
+                        "method": "post",
+                        "headers": {
+                            "Authorization": {
+                                "$title": "Base 64 encoded username and password"
+                            }
+                        },
+                        "body": "grant_type=(client_credentials | google)"
+                    },
+
+                    "response": {
+                        "token_type": "",
+                        "access_token": "",
+                        "expires_in": "",
+                        "scope": "",
+                        "refresh_token": ""
+                    }
+
+                }
+            ]
+        }
+
+    ]
+}

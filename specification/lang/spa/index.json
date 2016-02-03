@@ -1,0 +1,29 @@
+{
+    "title": "OAuth",
+
+    "resources": [
+
+        {
+            "title": "url de autorización"
+        },
+
+        {
+            "title": "url de token",
+
+            "exchanges": [
+                {
+                    "title": "autenticar con usuario y clave",
+
+                    "request": {
+                        "headers": {
+                            "Authorization": {
+                                "$title": "par usuario-clave codificado en Base 64"
+                            }
+                        }
+                    }
+                }
+            ]            
+        }        
+
+    ]
+}
