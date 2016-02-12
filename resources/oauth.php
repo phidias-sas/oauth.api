@@ -14,7 +14,7 @@
 
     "oauth/token" => [
         "post" => [
-            "controller" => "Phidias\Oauth\Controller->token({request})",
+            "controller" => "Phidias\Oauth\Controller->token({request}, {input})",
 
             "catch" => [
                 "Exception" => function($request, $response) {

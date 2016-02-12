@@ -5,6 +5,7 @@ class Controller
 {
     /**
      * Authentication function
+     * Validates and parses incoming token, and returns its payload
      *
      * To be used as a dispatcher authentication, like this:
      *
@@ -19,20 +20,15 @@ class Controller
     public static function authenticate($request)
     {
         if ($request->hasHeader("authorization")) {
-
-            list($authorizationMethod, $authorizationCredentials) = explode(" ", $request->getHeader("authorization")[0]);
-
+            list($authorizationMethod, $authorizationCredentials) = explode(" ", $request->getHeader("authorization")[0], 2);
             switch (strtolower($authorizationMethod)) {
                 case "bearer":
                     Token::load( trim($authorizationCredentials) );
+                    return Token::getPayload();
                 break;
             }
-
         }
-
-        return true;
     }
-
 
     /**
      * POST requests to /oauth/token require the user to provide
@@ -75,9 +71,9 @@ class Controller
     /**
      * Dispatch POST /oauth/token
      */
-    public function token($request)
+    public function token($request, $input)
     {
-        $postdata = (array)$request->getParsedBody();
+        $postdata = (array)$input;
 
         if (!isset($postdata["grant_type"])) {
             throw new Exception\InvalidRequest("no grant_type specified");
