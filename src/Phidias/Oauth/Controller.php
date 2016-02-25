@@ -1,6 +1,8 @@
 <?php
 namespace Phidias\Oauth;
 
+use Phidias\Utilities\Configuration;
+
 class Controller
 {
     /**
@@ -91,8 +93,8 @@ class Controller
             //break;
 
             // Temporary, since this does NOT follow the OAuth standard
-            case "google":
-                $token = self::getTokenFromGoogleToken($postdata);
+            case "google_authorization_code":
+                $token = self::getTokenFromGoogleAuthorizationCode($postdata);
             break;
 
             default:
@@ -121,22 +123,36 @@ class Controller
     }
 
 
-    private static function getTokenFromGoogleToken($postdata)
+    private static function getTokenFromGoogleAuthorizationCode($postdata)
     {
-        if (!isset($postdata["token"])) {
-            throw new Exception\InvalidRequest("no token specified");
+        if (!isset($postdata["code"])) {
+            throw new Exception\InvalidRequest("no code specified");
         }
 
-        $googleToken = $postdata["token"];
-        $userInfoUrl = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=".$googleToken;
+        $userInfoUrl = "https://www.googleapis.com/oauth2/v4/token";
+        $parameters = [
+            "code"          => $postdata["code"],
+            "client_id"     => Configuration::get("phidias.oauth.google.client_id"),
+            "client_secret" => Configuration::get("phidias.oauth.google.client_secret"),
+            "redirect_uri"  => Configuration::get("phidias.oauth.google.redirect_uri"),
+            "grant_type"    => "authorization_code"
+        ];
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $userInfoUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $result = curl_exec($ch);
+
+        curl_setopt($ch,CURLOPT_POST, count($parameters));
+        curl_setopt($ch,CURLOPT_POSTFIELDS, http_build_query($parameters));
+
+        $response = curl_exec($ch);
         curl_close($ch);
 
-        $tokenData = json_decode($result);
+        $responseData = json_decode($response);
+
+
+        // Quick and dirty extraction of the token payload (following JWT specification)
+        $tokenData = json_decode(base64_decode(explode(".", $responseData->id_token)[1]));
 
         if (!isset($tokenData->email)) {
             throw new Exception\InvalidRequest("could not obtain email from google token");
@@ -145,7 +161,6 @@ class Controller
         $payload = self::validateEmail($tokenData->email);
 
         return new Token("bearer", $payload);
-
     }
 
 
