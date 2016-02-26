@@ -150,6 +150,9 @@ class Controller
 
         $responseData = json_decode($response);
 
+        if (!isset($responseData->id_token)) {
+            throw new Exception\InvalidRequest("google did not grant an id token", $responseData);
+        }
 
         // Quick and dirty extraction of the token payload (following JWT specification)
         $tokenData = json_decode(base64_decode(explode(".", $responseData->id_token)[1]));
