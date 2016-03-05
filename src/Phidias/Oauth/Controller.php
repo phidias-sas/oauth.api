@@ -75,13 +75,7 @@ class Controller
      */
     public function token($request, $input)
     {
-        $postdata = (array)$input;
-
-        if (!isset($postdata["grant_type"])) {
-            throw new Exception\InvalidRequest("no grant_type specified");
-        }
-
-        switch ($postdata["grant_type"]) {
+        switch ($input->grant_type) {
 
             case "client_credentials":
                 $token = self::getTokenFromClientCredentials($request);
