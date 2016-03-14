@@ -88,7 +88,10 @@ class Controller
 
             // Temporary, since this does NOT follow the OAuth standard
             case "google_authorization_code":
-                $token = self::getTokenFromGoogleAuthorizationCode($postdata);
+                if (!isset($input->code)) {
+                    throw new Exception\InvalidRequest("no code specified");
+                }
+                $token = self::getTokenFromGoogleAuthorizationCode($input->code);
             break;
 
             default:
@@ -117,15 +120,11 @@ class Controller
     }
 
 
-    private static function getTokenFromGoogleAuthorizationCode($postdata)
+    private static function getTokenFromGoogleAuthorizationCode($code)
     {
-        if (!isset($postdata["code"])) {
-            throw new Exception\InvalidRequest("no code specified");
-        }
-
         $userInfoUrl = "https://www.googleapis.com/oauth2/v4/token";
         $parameters = [
-            "code"          => $postdata["code"],
+            "code"          => $code,
             "client_id"     => Configuration::get("phidias.oauth.google.client_id"),
             "client_secret" => Configuration::get("phidias.oauth.google.client_secret"),
             "redirect_uri"  => Configuration::get("phidias.oauth.google.redirect_uri"),
@@ -145,7 +144,7 @@ class Controller
         $responseData = json_decode($response);
 
         if (!isset($responseData->id_token)) {
-            throw new Exception\InvalidRequest("google did not grant an id token", $responseData);
+            throw new Exception\InvalidRequest("google says: ".json_encode($responseData));
         }
 
         // Quick and dirty extraction of the token payload (following JWT specification)
