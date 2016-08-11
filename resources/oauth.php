@@ -54,6 +54,12 @@
                 }
             ]
         ]
+    ],
+
+    "oauth/google" => [
+        "post" => [
+            "controller" => "Phidias\Oauth\Controller->google({input})"
+        ]
     ]
 
 ];

@@ -81,12 +81,12 @@ class Controller
                 $token = self::getTokenFromClientCredentials($request);
             break;
 
-            // 2DO: implement (!!!)
-            //case "authorization_code":
-            //    $token = self::getTokenFromAuthorizationCode($request);
-            //break;
+            // 2DO: implement this (!!!)
+            case "authorization_code":
+               throw new Exception\InvalidRequest("grant type not supported");
+            break;
 
-            // Temporary, since this does NOT follow the OAuth standard
+            // Temporary !!!  Deprecate this asap.  Use oauth/google endpoint instead
             case "google_authorization_code":
                 if (!isset($input->code)) {
                     throw new Exception\InvalidRequest("no code specified");
@@ -119,6 +119,14 @@ class Controller
         // 2DO: implement (!!!)
     }
 
+    public function google($input)
+    {
+        if (!isset($input->code)) {
+            throw new Exception\InvalidRequest("no code specified");
+        }
+
+        return self::getTokenFromGoogleAuthorizationCode($input->code);
+    }
 
     private static function getTokenFromGoogleAuthorizationCode($code)
     {
