@@ -1,7 +1,7 @@
 <?php
 namespace Phidias\Oauth;
 
-use JWT;
+use Firebase\JWT\JWT;
 
 class Token
 {
@@ -27,7 +27,7 @@ class Token
     public static function load($token)
     {
         try {
-            self::$payload = JWT::decode($token, self::$secret);
+            self::$payload = JWT::decode($token, self::$secret, ["HS256"]);
         } catch (\Exception $e) {
             throw new Exception\InvalidToken;
         }
