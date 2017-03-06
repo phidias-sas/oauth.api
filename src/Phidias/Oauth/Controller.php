@@ -180,7 +180,7 @@ class Controller
             throw new Exception\InvalidRequest("authorization header must contain basic header credentials");
         }
 
-        $parts = explode(":", base64_decode(trim($authorizationCredentials)));
+        $parts = explode(":", utf8_encode(base64_decode(trim($authorizationCredentials))));
 
         if (count($parts) != 2) {
             throw new Exception\InvalidRequest("malformed credentials header");
