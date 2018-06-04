@@ -128,6 +128,22 @@ class Controller
         return self::getTokenFromGoogleAuthorizationCode($input->code);
     }
 
+    public function office($input)
+    {
+        if (!isset($input->email)) {
+            throw new Exception\InvalidRequest("no email specified");
+        }
+
+        return self::getTokenFromOfficeAuthorizationCode($input->email);
+    }
+
+    private static function getTokenFromOfficeAuthorizationCode($code)
+    {
+        $payload = self::validateEmail($code);
+        
+        return new Token("bearer", $payload);
+    }
+
     private static function getTokenFromGoogleAuthorizationCode($code)
     {
         $userInfoUrl = "https://www.googleapis.com/oauth2/v4/token";

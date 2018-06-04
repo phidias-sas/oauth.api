@@ -60,6 +60,12 @@
         "post" => [
             "controller" => "Phidias\Oauth\Controller->google({input})"
         ]
+    ],
+
+    "oauth/office" => [
+        "post" => [
+            "controller" => "Phidias\Oauth\Controller->office({input})"
+        ]
     ]
 
 ];
