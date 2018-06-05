@@ -130,11 +130,11 @@ class Controller
 
     public function office($input)
     {
-        if (!isset($input->email)) {
+        if (!isset($input->code)) {
             throw new Exception\InvalidRequest("no email specified");
         }
 
-        return self::getTokenFromOfficeAuthorizationCode($input->email);
+        return self::getTokenFromOfficeAuthorizationCode($input->code);
     }
 
     private static function getTokenFromOfficeAuthorizationCode($code)
