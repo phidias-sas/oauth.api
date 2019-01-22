@@ -29,6 +29,9 @@ class Controller
                     return Token::getPayload();
                 break;
 
+                case "basic" :
+                break;
+
                 default:
                     throw new Exception\InvalidToken("unrecognized token format");
                 break;
