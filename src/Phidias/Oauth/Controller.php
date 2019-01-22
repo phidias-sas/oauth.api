@@ -29,7 +29,7 @@ class Controller
                     return Token::getPayload();
                 break;
 
-                case "basic" :
+                case "basic":
                 break;
 
                 default:
