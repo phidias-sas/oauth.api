@@ -28,6 +28,10 @@ class Controller
                     Token::load( trim($authorizationCredentials) );
                     return Token::getPayload();
                 break;
+
+                default:
+                    throw new Exception\InvalidToken("unrecognized token format");
+                break;
             }
         }
     }
@@ -140,7 +144,7 @@ class Controller
     private static function getTokenFromOfficeAuthorizationCode($code)
     {
         $payload = self::validateEmail($code);
-        
+
         return new Token("bearer", $payload);
     }
 
