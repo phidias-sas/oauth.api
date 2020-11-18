@@ -66,6 +66,12 @@
         "post" => [
             "controller" => "Phidias\Oauth\Controller->office({input})"
         ]
+    ],
+
+    "oauth/apple" => [
+        "post" => [
+            "controller" => "Phidias\Oauth\Controller->apple({input})"
+        ]
     ]
 
 ];
