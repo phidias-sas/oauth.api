@@ -70,7 +70,7 @@
 
     "oauth/apple" => [
         "post" => [
-            "controller" => "Phidias\Oauth\Controller->apple({input})"
+            "controller" => "Phidias\Api\Oauth\Controller->apple({input})"
         ]
     ]
 
