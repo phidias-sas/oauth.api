@@ -30,8 +30,7 @@ class Token
             // self::$payload = JWT::decode($token, self::$secret, ["HS256"]);
             self::$payload = JWT::decode($token, 'sssshhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh!', ["HS256"]);
         } catch (\Exception $e) {
-            // throw new Exception\InvalidToken;
-            throw new \Exception('invalid token oauth.api');
+            throw new Exception\InvalidToken;
         }
     }
 
