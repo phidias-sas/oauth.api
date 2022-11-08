@@ -11,6 +11,9 @@ class Token
     public $scope;
     public $refresh_token;
 
+
+    public static $token;
+
     private static $payload;
     private static $secret;
 
@@ -28,9 +31,8 @@ class Token
     {
         try {
             self::$payload = JWT::decode($token, self::$secret, ["HS256"]);
+            self::$token = $token;
         } catch (\Exception $e) {
-            print_r($e);
-            exit;
             throw new Exception\InvalidToken;
         }
     }
