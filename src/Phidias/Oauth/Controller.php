@@ -37,6 +37,12 @@ class Controller
                 break;
             }
         }
+
+        $params = $request->getQueryParams();
+        if (isset($params['_token']) && $params['_token']) {
+            Token::load( $params['_token'] );
+            return Token::getPayload();
+        }
     }
 
     /**
